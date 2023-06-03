@@ -17,6 +17,18 @@
     height: 20px;
 }
 
+.hover {
+    background-color: grey;
+}
+
+.boom {
+    background-color: red;
+}
+
+.empty {
+    background-color: grey;
+}
+
 .option-container {
     width: 500px;
     height: 60px;

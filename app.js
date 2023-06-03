@@ -1,7 +1,7 @@
 const gamesBoardContainer = document.querySelector("#gamesboard-container");
 const optionContainer = document.querySelector(".option-container");
 const flipButton = document.querySelector("#flip-button");
-
+const startButton = document.querySelector("#start-button");
 //option choosing
 let angle = 0;
 function flip() {
@@ -48,14 +48,7 @@ const carrier = new Ship("carrier", 5);
 const ships = [destroyer, submarine, cruiser, battleship, carrier];
 let notDropped;
 
-function addShipPiece(user, ship, startId) {
-  const allBoardBlocks = document.querySelectorAll(`#${user} div`);
-  let randomBoolean = Math.random() < 0.5;
-  let isHorizontal = user === "player" ? angle === 0 : randomBoolean;
-  let randomStartIndex = Math.floor(Math.random() * width * width);
-
-  let startIndex = startId ? startId : randomStartIndex;
-
+function getValidity(allBoardBlocks, isHorizontal, startIndex, ship) {
   let validStart = isHorizontal
     ? startIndex <= width * width - ship.length
       ? startIndex
@@ -91,14 +84,35 @@ function addShipPiece(user, ship, startId) {
   const notTaken = shipBlocks.every(
     (shipBlock) => !shipBlock.classList.contains("taken")
   );
+
+  return { shipBlocks, valid, notTaken };
+}
+
+function addShipPiece(user, ship, startId) {
+  const allBoardBlocks = document.querySelectorAll(`#${user} div`);
+  let randomBoolean = Math.random() < 0.5;
+  let isHorizontal = user === "player" ? angle === 0 : randomBoolean;
+  let randomStartIndex = Math.floor(Math.random() * width * width);
+
+  let startIndex = startId ? startId : randomStartIndex;
+  const { shipBlocks, valid, notTaken } = getValidity(
+    allBoardBlocks,
+    isHorizontal,
+    startIndex,
+    ship
+  );
   if (valid && notTaken) {
     shipBlocks.forEach((shipBlock) => {
       shipBlock.classList.add(ship.name);
       shipBlock.classList.add("taken");
     });
   } else {
-    if (user === "computer") addShipPiece(ship);
-    if (user === "player") notDropped = true;
+    if (user === "computer") {
+      addShipPiece(user, ship, startId);
+    }
+    if (user === "player") {
+      notDropped = true;
+    }
   }
 }
 ships.forEach((ship) => addShipPiece("computer", ship));
@@ -115,14 +129,47 @@ allPlayerBlocks.forEach((playerBlock) => {
   playerBlock.addEventListener("drop", dropShip);
 });
 function dragStart(e) {
+  notDropped = false;
   draggedShip = e.target;
 }
 function dragOver(e) {
   e.preventDefault();
+  const ship = ships[draggedShip.id];
+  highlightArea(e.target.id, ship);
 }
 
 function dropShip(e) {
   const startId = e.target.id;
   const ship = ships[draggedShip.id];
   addShipPiece("player", ship, startId);
+  if (!notDropped) {
+    draggedShip.remove();
+  }
 }
+
+//Add Highlight
+function highlightArea(startIndex, ship) {
+  const allBoardBlocks = document.querySelectorAll("#player div");
+  let isHorizontal = angle === 0;
+
+  const { shipBlocks, valid, notTaken } = getValidity(
+    allBoardBlocks,
+    isHorizontal,
+    startIndex,
+    ship
+  );
+  if (valid && notTaken) {
+    shipBlocks.forEach((shipBlock) => {
+      shipBlock.classList.add("hover");
+      setTimeout(() => shipBlock.classList.remove("hover"), 500);
+    });
+  }
+}
+
+let gameOver = false;
+let playerTurn;
+
+//Start game
+
+function startGame() {}
+startButton.addEventListener("click", startGame);
