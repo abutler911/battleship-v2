@@ -4,6 +4,21 @@ const flipButton = document.querySelector("#flip-button");
 const startButton = document.querySelector("#start-button");
 const infoDisplay = document.querySelector("#info");
 const turnDisplay = document.querySelector("#turn-display");
+
+const gameMode = "";
+const playerNum = 0;
+let ready = false;
+let enemyReady = false;
+let allShipsPlaced = false;
+let shotFired = -1;
+
+const socket = io();
+//get your player number
+socket.on("player-number", (num) => {
+  if (num === -1) {
+    infoDisplay.innerHTML = "Sorry, the server is full";
+  }
+});
 //option choosing
 let angle = 0;
 function flip() {
