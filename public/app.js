@@ -6,17 +6,23 @@ const infoDisplay = document.querySelector("#info");
 const turnDisplay = document.querySelector("#turn-display");
 
 const gameMode = "";
-const playerNum = 0;
+let playerNum = 0;
 let ready = false;
 let enemyReady = false;
 let allShipsPlaced = false;
 let shotFired = -1;
+let currentPlayer = "user";
 
 const socket = io();
 //get your player number
 socket.on("player-number", (num) => {
   if (num === -1) {
     infoDisplay.innerHTML = "Sorry, the server is full";
+  } else {
+    playerNum = parseInt(num);
+    if (playerNum === 1) currentPlayer = "enemy";
+
+    console.log(playerNum);
   }
 });
 //option choosing
